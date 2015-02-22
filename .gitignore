@@ -1,0 +1,11 @@
+.project
+.pydevproject
+
+.idea
+
+*~
+*.pyc
+
+auth.yaml
+
+venv/

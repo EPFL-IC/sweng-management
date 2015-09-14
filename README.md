@@ -4,7 +4,7 @@ This is a command-line tool that manages the student GitHub repositories of the 
 
 Each student has access to two repositories: one for individual exams and a shared repository for team-based projects.  The tool takes care of configuring the right permissions for each student and repository, based on team membership information.
 
-The student and team data reside in a [Google Sheets][https://docs.google.com/spreadsheets/] document, which the tool accesses through the Sheets API. Using a spreadsheet has several advantages:
+The student and team data reside in a [Google Sheets](https://docs.google.com/spreadsheets/) document, which the tool accesses through the Sheets API. Using a spreadsheet has several advantages:
 
   * It acts as a centralized place for student data, thus avoiding data duplication across different tools and use cases. The sheet acts as a lightweight central database that is both human and machine-readable.
   * The data can be annotated and expanded without affecting this tool's functionality.  For instance, cell formatting can be used to mark dropped-out students and additional sheets can be added for statistics, additional data, etc.

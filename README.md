@@ -42,9 +42,9 @@ Before using the tool, perform the following steps:
 
   5. Verify your setup by running the tool in "repair" mode, which fills in all the missing columns in the Students sheet:
       
-      $ venv/bin/activate
-      $ ./manage.py repair
-      $ deactivate
+        $ venv/bin/activate
+        $ ./manage.py repair
+        $ deactivate
 
   You should activate the virtual Python environment before using the tool and deactivate it when no longer needed.
 

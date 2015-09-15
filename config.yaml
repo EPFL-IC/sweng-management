@@ -1,18 +1,19 @@
 ##########################################
-# Software Engineering 2014 Configuration
+# Software Engineering 2015 Configuration
 ##########################################
 
 # Student spreadsheet configuration
 spreadsheet:
-    title: SwEng 2014 Students
+    title: SwEng Students 2015
     students_worksheet: Students
     teams_worksheet: Teams
 
 # Github organization configuration
 organization:
-    name: sweng-epfl-2014
-    staff-team-id: 1234567 # Get this from the team URL in the web interface
-    class-team-id: 2345678
+    name: sweng-epfl-2015
+    # these are the correct IDs for 2015
+    staff-team-id: 1754583
+    class-team-id: 1760748
 
     homework-team-prefix: "SwEng Team - "
     homework-repo-prefix: "sweng-team-"
@@ -20,6 +21,7 @@ organization:
     exam-repo-prefix: "sweng-student-"
 
 google_auth:
+    # do this for your own google auth credentials
     client_id: 123.apps.googleusercontent.com
     # This should be stored secretly somewhere...
     client_secret: XYZ

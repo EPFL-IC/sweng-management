@@ -25,22 +25,30 @@ Before using the tool, perform the following steps:
 
         $ ./setup_venv.sh
 
-  2. Set up the GitHub organization that will hold the private student repositories.  You should create a free organization and then visit http://education.github.com/ to apply for free private repositories for your students.  You should ask for enough repositories to cover the exam and team repositories.  Create two GitHub teams in the organization: a Staff team and a Class team.  The former will be added to all repositories created by the tool, while the latter is used in case the staff decides to open the repositories to all students.  The names of the teams don't matter, but you should write down their numeric IDs, which you find in the team URLs in the web UI.
+  2. Set up the GitHub organization that will hold the private student repositories.  You should create a free organization and then visit http://education.github.com/ to apply for free private repositories for your students.  You should ask for enough repositories to cover the exam and team repositories.  Create two GitHub teams in the organization: a Staff team and a Class team.  The former will be added to all repositories created by the tool, while the latter is used in case the staff decides to open the repositories to all students.
 
-  3. Create the Google spreadsheet holding student and team information.  The simplest approach is to make a copy of the [template spreadsheet][template] and populate it with your student and team data.  Make sure to give the spreadsheet an appropriate name, such as "SwEng Students 2015".  Hover over the header fields in the sheet for additional help.
+  3. Retrieve the numeric IDs for both the Staff and Class teams for a later step. Using [this API call](https://developer.github.com/v3/orgs/teams/#list-teams), run the following command:
+
+     `curl --user 'used:password' https://api.github.com/orgs/SWENG-ORG/teams`
+
+     Where `SWENG-ORG` is the name of your SwEng organization (e.g. `sweng-epfl-201N`). If you have 2-factor authentication, you will have to get a personal access token to use instead of `password` for this command. [Visit this settings page to get your token](https://github.com/settings/tokens).
+
+     Write down the `"id"` field values for each of the times for a later step.
+
+  4. Create the Google spreadsheet holding student and team information.  The simplest approach is to make a copy of the [template spreadsheet][template] and populate it with your student and team data.  Make sure to give the spreadsheet an appropriate name, such as "SwEng Students 2015".  Hover over the header fields in the sheet for additional help.
 
   **NOTE:** It is sufficient to fill only one of the ``GASPAR``, ``Name``, ``E-mail``, or ``SCIPER`` fields.  The tool will later fill in the missing data from the EPFL LDAP directory.
 
   **NOTE:** It is important to leave the headers intact, as the tool looks up columns by their header name.
 
-  4. Configure the tool by editing the ``config.yaml`` file.  You should change at least the following fields:
+  5. Configure the tool by editing the ``config.yaml`` file.  You should change at least the following fields:
 
     * ``spreadsheet.title`` should contain the name of the Google Sheets document created at step 3 (e.g., ``SwEng Students 2015``).
     * ``organization.name`` should contain the identifier of the GitHub organization created at step 2 (e.g., ``sweng-epfl-2015``).
     * ``organization.staff-team-id`` and ``organization.class-team-id`` should contain the IDs of the staff and class teams created at step 2.
     * ``google_auth.client_id`` and ``google_auth.client_secret`` should point to the Google credentials the tool should use to access the spreadsheet.  You can create these credentials in the [Google Developer Console](https://console.developers.google.com).  First, create a new project, then go to "APIs & auth" / "Credentials", then add an "OAuth 2.0 client ID" credential.
 
-  5. Verify your setup by running the tool in "repair" mode, which fills in all the missing columns in the Students sheet:
+  6. Verify your setup by running the tool in "repair" mode, which fills in all the missing columns in the Students sheet:
       
         $ venv/bin/activate
         $ ./manage.py repair

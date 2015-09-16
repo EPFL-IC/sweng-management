@@ -20,11 +20,25 @@
 
 import getpass
 import github3
+import socket
 import logging
 
 
 class GithubAuthorizationError(Exception):
     pass
+
+def two_factor_callback():
+    try:
+    # Python 2
+        prompt = raw_input
+    except NameError:
+    # Python 3
+        prompt = input
+
+    code = ""
+    while code == "":
+        code = prompt("GitHub 2-Factor auth code: ")
+    return code
 
 class GithubAuthProvider(object):
     SCOPES = [ "repo", "delete_repo" ]
@@ -35,6 +49,20 @@ class GithubAuthProvider(object):
         self.token = None
 
     def authenticate(self, non_interactive=False):
+        def attempt_auth(note):
+            return github3.authorize(login=user_name,
+                                     password=user_pwd,
+                                     scopes=self.SCOPES,
+                                     note_url=self._config["github_auth"]["url"],
+                                     note=note,
+                                     two_factor_callback=two_factor_callback)
+        def code_exists(github_err):
+            if github_err.code == 422:
+                for error in github_err.errors:
+                    if error.get('code') == 'already_exists':
+                        return True
+            return False
+
         self.token = self._auth_config.setdefault("github", {}).get("token")
 
         if not self.token:
@@ -43,11 +71,20 @@ class GithubAuthProvider(object):
 
             user_name = raw_input("Enter Github login: ")
             user_pwd = getpass.getpass("Password:")
-
-            auth = github3.authorize(user_name, user_pwd,
-                                     self.SCOPES,
-                                     self._config["github_auth"]["note"],
-                                     self._config["github_auth"]["url"])
+            note = self._config["github_auth"]["note"]
+            try:
+                auth = attempt_auth(note)
+            except github3.GitHubError, ghe:
+                if ghe.code == 422 and code_exists(ghe):
+                    hostname = socket.gethostname()
+                    logging.warning(
+                        "GitHub: Authorization exists for url '{url}' and note '{note}'!\n\n\tExtending note with hostname '{host}'...".format(
+                        url=self._config["github_auth"]["url"], note=note, host=hostname))
+                    auth = attempt_auth("{note}, {host}".format(
+                        note=note, host=hostname
+                    ))
+                else:
+                    raise ghe
             self.token = auth.token
             logging.info("Got authorization token: %s" % self.token)
 

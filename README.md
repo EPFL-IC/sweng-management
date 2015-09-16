@@ -56,6 +56,15 @@ Before using the tool, perform the following steps:
 
   You should activate the virtual Python environment before using the tool and deactivate it when no longer needed.
 
+### A note about GitHub authentication for multiple machines
+
+It may be common for TAs for a particular year to commit (to their private repo) a version of `config.yaml` that includes the numeric IDs from step 3, as well as the names for the spreadsheet (as configured in step 5). It may be common for individual TAs to __privately__ maintain their own subsequent copy of `config.yaml` with their Google credentials (_don't share this!_). This is very convenient.
+
+For GitHub authentication, a new token won't be generated if the `note` and `url` in the `github_auth` section of `config.yaml` are the same. Thus, if you copy over `config.yaml` to another machine and want to active GitHub on _that_ machine, this tool will append the hostname to the note (to make it unique to that machine). However, if you keep getting a GitHub error with code `422`, it means that you need to do one of the following:
+
+ * Manually change the `url` or `note` field in the `github_auth` section of `config.yaml` to something else and unique.
+ * Remove existing conflicting [GitHub personal access tokens](https://github.com/settings/tokens).
+
 ## Usage
 
 Run ``./manage.py -h`` to see a list of possible commands.  Below is a (possibly outdated) snapshot:

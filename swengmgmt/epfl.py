@@ -19,7 +19,7 @@
 
 
 import ldap
-
+import re
 
 # TODO: Move this in a configuration
 LDAP_HOST = "ldap://ldap.epfl.ch"
@@ -66,6 +66,20 @@ class EPFL_LDAP(object):
     def __init__(self):
         self.ldap_obj = ldap.initialize(LDAP_HOST)
 
+    def pick_best_result(self, results):
+        """
+        The only hack this covers is when students have multiple 'uid' (i.e. GASPAR) logins.
+        This happens when the user is GASPAR@FOO, where FOO is usually a unit. This only
+        happens once in a while, but this takes care of those weird results.
+
+        This primarily happens when the result is from a lookup based on sciper number.
+        :param results: The list of MULTIPLE RESULTS from lookup
+        :return: a single "best" result
+        """
+        first = results[0]
+        first[1]['uid'] = [re.search("^([a-z]+)(?:@.*)?$", first[1]['uid'][0]).group(1)]
+        return [first]
+
     def lookup(self, student_data):
         """Refresh a data object for a student from the LDAP directory."""
 
@@ -83,6 +97,8 @@ class EPFL_LDAP(object):
 
         if not result:
             raise StudentNotFoundError()
+        elif len(result) > 1:
+            result = self.pick_best_result(result)
 
         entry = result[0][1]
 

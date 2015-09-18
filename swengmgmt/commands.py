@@ -134,7 +134,8 @@ class StudentsListCommand(GithubCommand):
             print util.bold(str(student))
             print "  Team: %s" % util.red_if_none(student.team_name)
             print "  Github ID: %s" % util.red_if_none(student.github_id)
-            print "  Team Clone URL: %s" % util.red_if_none(student.team.repo_ssh_url)
+            if student.team:
+                print "  Team Clone URL: %s" % util.red_if_none(student.team.repo_ssh_url)
             print "  Exam Clone URL: %s" % util.red_if_none(student.repo_ssh_url)
             print "  Exam access: %s" % util.red_if_none(util.red_green(
                 student.repo_access, "pull", "push"))

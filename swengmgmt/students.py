@@ -254,7 +254,7 @@ class SwEngClass(object):
 
         # Populate the Github team
         for student in team.students:
-            if team.gh_team.add_member(student.github_id):
+            if team.gh_team.invite(student.github_id):
                 logging.info("Added %s (%s) to team %s."
                              % (student.github_id, student, team))
             else:
@@ -291,7 +291,7 @@ class SwEngClass(object):
             logging.info("Created exam team for student %s." % student)
 
         # Populate the Github team
-        if student.gh_team.add_member(student.github_id):
+        if student.gh_team.invite(student.github_id):
             logging.info("Added %s (%s) to his/her exam repo."
                          % (student.github_id, student))
 
@@ -306,7 +306,7 @@ class SwEngClass(object):
 
         for team in self.teams.itervalues():
             for student in team.students:
-                class_team.add_member(student.github_id)
+                class_team.invite(student.github_id)
             class_team.add_repo(team.gh_repo.full_name)
 
     def closeTeamReposToClass(self, github_org):

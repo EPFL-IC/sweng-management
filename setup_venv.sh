@@ -5,6 +5,13 @@
 
 set -e
 
+official_name=official
+official_repo="https://github.com/EPFL-IC/sweng-management"
+if ! git remote show "$official_name" &>/dev/null; then
+    git remote add "$official_name" "$official_repo"
+    git fetch "$official_name"
+fi
+
 # Temporarily download Virtualenv's source code
 mkdir virtualenv
 curl https://pypi.python.org/packages/source/v/virtualenv/virtualenv-13.1.2.tar.gz | tar -xz -C virtualenv --strip-components=1

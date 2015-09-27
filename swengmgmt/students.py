@@ -287,8 +287,11 @@ class SwEngClass(object):
                 "".join([self._org_config["exam-team-prefix"], student.gaspar,
                          " (%s)" % student.name]),
                 permission="push")
-            student.gh_team.add_repo(student.gh_repo.full_name)
+
             logging.info("Created exam team for student %s." % student)
+
+        if not student.gh_team.has_repo(student.gh_repo.full_name):
+            student.gh_team.add_repo(student.gh_repo.full_name)
 
         # Populate the Github team
         if student.gh_team.invite(student.github_id):

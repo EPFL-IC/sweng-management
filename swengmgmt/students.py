@@ -273,6 +273,30 @@ class SwEngClass(object):
 
         team.gh_team.edit(team.gh_team.name, permission='push')
 
+    def hideExamRepo(self, student, github_org):
+        if student.gh_repo:
+            if student.gh_team:
+                staff_team = github_org.team(self._org_config["staff-team-id"])
+                if staff_team in (a for a in student.gh_repo.iter_teams()):
+                    if not student.gh_team.remove_repo(student.gh_repo):
+                            #"".join([self._org_config["exam-repo-prefix"], student.gaspar])):
+                        logging.warning("Unable to remove {st} as a collaborator for their repo".format(
+                            st=student
+                        ))
+                    else:
+                        logging.info("Hid {repo} from student {st}".format(
+                            st=student, repo=student.gh_repo
+                        ))
+                else:
+                    logging.warning("Not hiding student '{st}' from repo because staff team '{staff}' is not on the team".format(
+                        st=student, staff=staff_team
+                    ))
+            else:
+                st="Student '{st}' has a gh_repo, but no team!".format(st=student)
+                logging.error(st)
+        else:
+            logging.info("Student {st} does not have a repo. Skipping".format(st=student))
+
     def createExamRepo(self, student, github_org):
         # Create the repo
         if not student.gh_repo:

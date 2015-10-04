@@ -228,6 +228,29 @@ class StudentsPermCommand(GithubCommand):
         for student in student_list:
             student.updateTeamPermission(args.permission)
 
+class StudentsHideCommand(GithubCommand):
+    """Hide the student's repository, if it exists, by removing them as a collaborator."""
+
+    arg_name = "students-hide"
+
+    def register(self, parser):
+        parser.add_argument("--exclude", nargs="*",
+                    help="A list of students to exclude.")
+        parser.add_argument("students", nargs="*",
+                            help="A list of students to consider. "
+                            "Leave empty to include everyone.")
+
+    def execute(self, args):
+        if not (args.students or self.confirmClassOperation()):
+            return
+
+        super(StudentsHideCommand, self).execute(args)
+
+        query = students.StudentQuery(args.students, args.exclude)
+        student_list = self.sweng_class.findStudents(query)
+
+        for student in student_list:
+            self.sweng_class.hideExamRepo(student, self.github_org)
 
 class StudentsCreateCommand(GithubCommand):
     """Create exam repos for students."""
@@ -380,7 +403,7 @@ class ClassClose(GithubCommand):
 ALL_COMMANDS = [StudentsListCommand, StudentsPermCommand, StudentsCreateCommand,
                 StudentsDeleteCommand, TeamsListCommand, TeamsPermCommand,
                 TeamsCreateCommand, TeamsDeleteCommand, RepairCommand,
-                ClassOpen, ClassClose, StaffPermCommand]
+                ClassOpen, ClassClose, StaffPermCommand, StudentsHideCommand]
 
 
 def registerGlobalArguments(parser):

@@ -158,6 +158,11 @@ class SwEngClass(object):
             "".join([re.escape(self._org_config["homework-repo-prefix"]),
                      r"(.*)"]))
 
+    def changeStaffPermissions(self, github_org, permission):
+        staff_team = github_org.team(self._org_config["staff-team-id"])
+        staff_team.edit(name=staff_team.name,
+                        permission=permission)
+
     def populateFromSpreadsheet(self, student_sheet, team_sheet):
         student_list = student_sheet.getStudentList(SwEngStudent)
         self.students = { student.gaspar: student for student in student_list }

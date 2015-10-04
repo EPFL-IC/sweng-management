@@ -190,6 +190,17 @@ class StudentsListCommand(GithubCommand):
         elif args.format == "tabular":
             self._printTabular(student_list)
 
+class StaffPermCommand(GithubCommand):
+    arg_name = "staff-perm"
+
+    def register(self, parser):
+        parser.add_argument("permission", choices=["push", "pull"],
+                            help="The permission to set.")
+
+    def execute(self, args):
+        super(StaffPermCommand, self).execute(args)
+        self.sweng_class.changeStaffPermissions(
+            github_org=self.github_org, permission=args.permission)
 
 class StudentsPermCommand(GithubCommand):
     """Update student permissions."""
@@ -369,7 +380,7 @@ class ClassClose(GithubCommand):
 ALL_COMMANDS = [StudentsListCommand, StudentsPermCommand, StudentsCreateCommand,
                 StudentsDeleteCommand, TeamsListCommand, TeamsPermCommand,
                 TeamsCreateCommand, TeamsDeleteCommand, RepairCommand,
-                ClassOpen, ClassClose]
+                ClassOpen, ClassClose, StaffPermCommand]
 
 
 def registerGlobalArguments(parser):

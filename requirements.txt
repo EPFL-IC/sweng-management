@@ -1,6 +1,6 @@
 PyYAML>=3.11
 gdata>=2.0.18
-github3.py>=0.9.1
+github3.py>=0.9.4
 python-ldap>=2.4.16
 requests>=2.4.1
 uritemplate.py>=0.3.0

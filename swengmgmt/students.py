@@ -323,7 +323,7 @@ class SwEngClass(object):
             student.gh_team.add_repo(student.gh_repo.full_name)
 
         # Populate the Github team
-        if student.gh_team.invite(student.github_id):
+        if not student.gh_team.is_member(student.github_id) and student.gh_team.invite(student.github_id):
             logging.info("Added %s (%s) to his/her exam repo."
                          % (student.github_id, student))
 

@@ -20,8 +20,11 @@
 
 import logging
 import re
+import shlex
+import subprocess
 
 from swengmgmt import epfl
+from util import cd
 
 
 class GithubEntity(object):
@@ -297,7 +300,24 @@ class SwEngClass(object):
         else:
             logging.info("Student {st} does not have a repo. Skipping".format(st=student))
 
-    def createExamRepo(self, student, github_org):
+    def cloneRepo(self, repo_path, student, github_org):
+        # Set to false in case you want to populate the exam repo beforehand
+        self.createExamRepo(student, github_org, add_to_team=False)
+        self.hideExamRepo(student, github_org)
+        with cd(repo_path):
+            subprocess.check_call(shlex.split(
+                "git remote add student {student_url}".format(
+                    student_url=student.gh_repo.ssh_url
+                )
+            ))
+            subprocess.check_call(shlex.split(
+                "git push student 'refs/remotes/origin/*:refs/heads/*'"
+            ))
+            subprocess.check_call(shlex.split(
+                "git remote rm student"
+            ))
+
+    def createExamRepo(self, student, github_org, add_to_team=True):
         # Create the repo
         if not student.gh_repo:
             student.gh_repo = github_org.create_repo(
@@ -319,7 +339,7 @@ class SwEngClass(object):
 
             logging.info("Created exam team for student %s." % student)
 
-        if not student.gh_team.has_repo(student.gh_repo.full_name):
+        if add_to_team and not student.gh_team.has_repo(student.gh_repo.full_name):
             student.gh_team.add_repo(student.gh_repo.full_name)
 
         # Populate the Github team

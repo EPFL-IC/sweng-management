@@ -353,6 +353,12 @@ class SwEngClass(object):
                 logging.info("Removed %s from exam repo %s"
                              % (member.login, student))
 
+    def addStudentToClassTeam(self, student, github_org):
+        class_team = github_org.team(self._org_config["class-team-id"])
+        student_gh_id = student.github_id
+        if not class_team.is_member(student_gh_id):
+            class_team.invite(student_gh_id)
+
     def openTeamReposToClass(self, github_org):
         class_team = github_org.team(self._org_config["class-team-id"])
 

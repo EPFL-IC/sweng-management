@@ -439,11 +439,32 @@ class ClassClose(GithubCommand):
         self.sweng_class.closeTeamReposToClass(self.github_org)
 
 
+class ClassCreate(GithubCommand):
+    """Add all the students to an all-class team."""
+
+    arg_name = "class-create"
+
+    def register(self, parser):
+        parser.add_argument("--exclude", nargs="*",
+                            help="A list of students to exclude.")
+        parser.add_argument("students", nargs="*",
+                        help="A list of students to consider. "
+                             "Leave empty to include everyone.")
+
+    def execute(self, args):
+        super(ClassCreate, self).execute(args)
+
+        query = students.StudentQuery(args.students, args.exclude)
+        student_list = self.sweng_class.findStudents(query)
+
+        for student in student_list:
+            self.sweng_class.addStudentToClassTeam(student, self.github_org)
+
 ALL_COMMANDS = [StudentsListCommand, StudentsPermCommand, StudentsCreateCommand,
                 StudentsDeleteCommand, TeamsListCommand, TeamsPermCommand,
                 TeamsCreateCommand, TeamsDeleteCommand, RepairCommand,
-                ClassOpen, ClassClose, StaffPermCommand, StudentsHideCommand,
-                StudentsPopulateCommand]
+                ClassOpen, ClassClose, ClassCreate, StaffPermCommand,
+                StudentsHideCommand, StudentsPopulateCommand]
 
 
 def registerGlobalArguments(parser):

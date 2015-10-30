@@ -23,6 +23,14 @@ import sys
 
 """Misc utilities."""
 
+@contextlib.contextmanager
+def cd(newdir):
+    prevdir = os.getcwd()
+    os.chdir(os.path.expanduser(newdir))
+    try:
+        yield
+    finally:
+        os.chdir(prevdir)
 
 @contextlib.contextmanager
 def hl_region(bold=False, color=None, fs=None):

@@ -20,7 +20,11 @@
 __author__ = "stefan.bucur@epfl.ch (Stefan Bucur)"
 
 
+import shutil
 import os
+import shlex
+import subprocess
+import tempfile
 import yaml
 
 from swengmgmt import epfl
@@ -273,6 +277,41 @@ class StudentsCreateCommand(GithubCommand):
         for student in student_list:
             self.sweng_class.createExamRepo(student, self.github_org)
 
+class StudentsPopulateCommand(GithubCommand):
+    """Force push a given repository to students' exam repositories"""
+
+    arg_name = "students-populate"
+
+    def register(self, parser):
+        parser.add_argument("--exclude", nargs="*",
+                            help="A list of students to exclude.")
+        parser.add_argument("--clone", required=True,
+                            help="The repo repository to clone into all student repositories.")
+        parser.add_argument("students", nargs="*",
+                            help="A list of students to consider. "
+                            "Leave empty to include everyone.")
+
+    def clone_repo(self, clone_url, local_dir):
+        with util.cd(local_dir):
+            subprocess.check_call(shlex.split("git clone {url} clone_source".format(
+                local_dir=local_dir, url=clone_url
+            )))
+        return "{dir}/clone_source".format(dir=local_dir)
+
+    def execute(self, args):
+        super(StudentsPopulateCommand, self).execute(args)
+        query = students.StudentQuery(args.students, args.exclude)
+        student_list = self.sweng_class.findStudents(query)
+
+        clone_dir = tempfile.mkdtemp()
+        try:
+            repo_path = self.clone_repo(clone_url=args.clone, local_dir=clone_dir)
+            for student in student_list:
+                self.sweng_class.cloneRepo(repo_path=repo_path,
+                                           student=student, github_org=self.github_org)
+        finally:
+            shutil.rmtree(clone_dir, ignore_errors=True)
+
 
 class StudentsDeleteCommand(GithubCommand):
     """[DANGEROUS] Delete the exam repos of students."""
@@ -400,10 +439,32 @@ class ClassClose(GithubCommand):
         self.sweng_class.closeTeamReposToClass(self.github_org)
 
 
+class ClassCreate(GithubCommand):
+    """Add all the students to an all-class team."""
+
+    arg_name = "class-create"
+
+    def register(self, parser):
+        parser.add_argument("--exclude", nargs="*",
+                            help="A list of students to exclude.")
+        parser.add_argument("students", nargs="*",
+                        help="A list of students to consider. "
+                             "Leave empty to include everyone.")
+
+    def execute(self, args):
+        super(ClassCreate, self).execute(args)
+
+        query = students.StudentQuery(args.students, args.exclude)
+        student_list = self.sweng_class.findStudents(query)
+
+        for student in student_list:
+            self.sweng_class.addStudentToClassTeam(student, self.github_org)
+
 ALL_COMMANDS = [StudentsListCommand, StudentsPermCommand, StudentsCreateCommand,
                 StudentsDeleteCommand, TeamsListCommand, TeamsPermCommand,
                 TeamsCreateCommand, TeamsDeleteCommand, RepairCommand,
-                ClassOpen, ClassClose, StaffPermCommand, StudentsHideCommand]
+                ClassOpen, ClassClose, ClassCreate, StaffPermCommand,
+                StudentsHideCommand, StudentsPopulateCommand]
 
 
 def registerGlobalArguments(parser):

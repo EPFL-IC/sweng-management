@@ -324,7 +324,7 @@ class SwEngClass(object):
             else:
                 logging.warn("Student {} doesn't have an exam repo".format(student))
 
-    def createExamRepo(self, student, github_org, add_to_team=True):
+    def createExamRepo(self, student, github_org, add_to_team=True, read_only=False):
         # Create the repo
         if not student.gh_repo:
             student.gh_repo = github_org.create_repo(
@@ -347,7 +347,12 @@ class SwEngClass(object):
             logging.info("Created exam team for student %s." % student)
 
         if add_to_team and not student.gh_team.has_repo(student.gh_repo.full_name):
+            old_perm = student.repo_access
+            if read_only:
+                student.updateTeamPermission("pull")
             student.gh_team.add_repo(student.gh_repo.full_name)
+            if read_only:
+                student.updateTeamPermission(old_perm)
 
         # Populate the Github team
         if not student.gh_team.is_member(student.github_id) and student.gh_team.invite(student.github_id):

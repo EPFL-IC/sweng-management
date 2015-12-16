@@ -317,6 +317,13 @@ class SwEngClass(object):
                 "git remote rm student"
             ))
 
+    def deleteExamRepo(self, student, github_org):
+        if student.gh_repo:
+            if student.gh_repo.delete():
+                logging.info("Deleting exam repo for student {}".format(student))
+            else:
+                logging.warn("Student {} doesn't have an exam repo".format(student))
+
     def createExamRepo(self, student, github_org, add_to_team=True):
         # Create the repo
         if not student.gh_repo:

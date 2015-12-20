@@ -319,10 +319,22 @@ class StudentsDeleteCommand(GithubCommand):
     arg_name = "students-delete"
 
     def register(self, parser):
-        pass
+        parser.add_argument("--exclude", nargs="*",
+                            help="A list of students to exclude.")
+        parser.add_argument("students", nargs="*",
+                            help="A list of students to consider. "
+                                 "Leave empty to include everyone.")
 
     def execute(self, args):
-        pass
+        if not (args.students or self.confirmClassOperation()):
+            return
+        super(StudentsDeleteCommand, self).execute(args)
+
+        query = students.StudentQuery(args.students, args.exclude)
+        student_list = self.sweng_class.findStudents(query)
+
+        for student in student_list:
+            self.sweng_class.deleteExamRepo(student, self.github_org)
 
 
 class TeamsListCommand(GithubCommand):

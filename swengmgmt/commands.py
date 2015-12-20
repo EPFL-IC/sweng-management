@@ -264,6 +264,8 @@ class StudentsCreateCommand(GithubCommand):
     def register(self, parser):
         parser.add_argument("--exclude", nargs="*",
                             help="A list of students to exclude.")
+        parser.add_argument("--read-only", default=False, action='store_true',
+                            help="Make this repo read-only for students")
         parser.add_argument("students", nargs="*",
                             help="A list of students to consider. "
                             "Leave empty to include everyone.")
@@ -275,7 +277,7 @@ class StudentsCreateCommand(GithubCommand):
         student_list = self.sweng_class.findStudents(query)
         
         for student in student_list:
-            self.sweng_class.createExamRepo(student, self.github_org)
+            self.sweng_class.createExamRepo(student, self.github_org, read_only=args.read_only)
 
 class StudentsPopulateCommand(GithubCommand):
     """Force push a given repository to students' exam repositories"""
